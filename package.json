@@ -1,0 +1,15 @@
+{
+  "name": "com.db.cubization",
+  "version": "1.0.0",
+  "displayName": "Cubization",
+  "description": "Generates mesh with vertecies for center of cubes with specified size",
+  "unity": "2022.3",
+  "unityRelease": "5f1",
+  "dependencies": {
+    "com.unity.collections": "2.1.4"
+  },
+  "author": {
+    "name": "Isormour",
+    "email": "isormour@gmail.com"
+  }
+}
