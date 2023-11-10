@@ -83,12 +83,15 @@ public class CubizationWindow : EditorWindow
 
     void Bake()
     {
-        Verts = new List<Vector3>();
-        Bounds bounds = mesh.sharedMesh.bounds;
+        BakeMesh(this.mesh, this.useScale, this.cubeSize);
+    }
+    public static void BakeMesh(MeshFilter meshToBake,bool useScale,float cubeSize)
+    {
+        Bounds bounds = meshToBake.sharedMesh.bounds;
         float3 Size = bounds.size;
         if (useScale)
         {
-            Size = MultVector(Size, mesh.transform.localScale);
+            Size = MultVector(Size, meshToBake.transform.localScale);
         }
 
         int x, y, z;
@@ -97,15 +100,16 @@ public class CubizationWindow : EditorWindow
         z = (int)(Size.z / cubeSize);
 
         List<Triangle> tris = new List<Triangle>();
-        CreateTriangles(tris);
-        CheckBoxTriIntersection(bounds, x, y, z, tris);
-        CreateMeshAsset();
+        CreateTriangles(tris,meshToBake,useScale);
+        List<Vector3> verts = CheckBoxTriIntersection(bounds, x, y, z, tris,meshToBake,useScale,cubeSize);
+        CreateMeshAsset(meshToBake,verts);
     }
 
-    private void CheckBoxTriIntersection(Bounds bounds, int x, int y, int z, List<Triangle> tris)
+    static List<Vector3> CheckBoxTriIntersection(Bounds bounds, int x, int y, int z, List<Triangle> tris,MeshFilter mesh,bool useScale,float cubeSize)
     {
-        // check intersection for cubes of position x.y.z and triangles
-        Vector3 minPosition = bounds.min;
+        List<Vector3> vectors = new List<Vector3>();
+         // check intersection for cubes of position x.y.z and triangles
+         Vector3 minPosition = bounds.min;
         if (useScale)
         {
             minPosition = MultVector(minPosition, mesh.transform.lossyScale);
@@ -137,10 +141,11 @@ public class CubizationWindow : EditorWindow
             {
                 Vector3 cubeCenter = minPosition + new Vector3(cubeSize, cubeSize, cubeSize) / 2;
                 cubeCenter += new Vector3(cubeSize * i, cubeSize * j, cubeSize * k);
-                Verts.Add(cubeCenter);
+                vectors.Add(cubeCenter);
             }
         }
         result.Dispose();
+        return vectors;
     }
 
     [BurstCompile]
@@ -177,7 +182,7 @@ public class CubizationWindow : EditorWindow
             }
         }
     }
-    private void CreateMeshAsset()
+    private static void CreateMeshAsset(MeshFilter mesh,List<Vector3> Verts)
     {
         Mesh vertMesh = new Mesh();
         vertMesh.name = mesh.name + "_Cubizied.asset";
@@ -194,7 +199,7 @@ public class CubizationWindow : EditorWindow
         AssetDatabase.CreateAsset(vertMesh, path + mesh.name + "_Cubizied.asset");
         AssetDatabase.SaveAssets();
     }
-    private void CreateTriangles(List<Triangle> tris)
+    private static void CreateTriangles(List<Triangle> tris,MeshFilter mesh,bool useScale)
     {
         for (int i = 0; i < mesh.sharedMesh.triangles.Length; i += 3)
         {
@@ -211,7 +216,7 @@ public class CubizationWindow : EditorWindow
             tris.Add(tempTri);
         }
     }
-    float3 MultVector(float3 a, float3 b)
+    static float3 MultVector(float3 a, float3 b)
     {
         float3 result = a;
         result.x *= b.x;
