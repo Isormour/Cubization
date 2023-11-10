@@ -1,5 +1,5 @@
 {
-  "name": "com.db.cubization",
+  "name": "com.db.cubizationtool",
   "version": "1.0.0",
   "displayName": "cubization",
   "description": "Generates mesh with vertecies for center of cubes with specified size",
