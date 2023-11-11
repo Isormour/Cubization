@@ -22,7 +22,7 @@ public class CubizationWindow : EditorWindow
     }
     public void Initialize()
     {
-  
+
     }
     private void OnGUI()
     {
@@ -42,7 +42,7 @@ public class CubizationWindow : EditorWindow
         if (GUILayout.Button("Create"))
         {
             BakeMesh(this.mesh, this.useScale, this.cubeSize, out List<Vector3> verts);
-            
+
             if (visualise)
             {
                 CreateDebugCubes(verts);
@@ -62,31 +62,36 @@ public class CubizationWindow : EditorWindow
             cube.name = "Cube " + i;
         }
     }
-    public static void BakeMesh(MeshFilter meshToBake,bool useScale,float cubeSize ,out List<Vector3> verts)
+    public static void BakeMesh(MeshFilter meshToBake, bool useScale, float cubeSize, out List<Vector3> verts)
     {
         Bounds bounds = meshToBake.sharedMesh.bounds;
-        float3 Size = bounds.size;
+        float3 size = bounds.size;
+
+        size.x = Mathf.Max(size.x, cubeSize + 0.01f);
+        size.y = Mathf.Max(size.y, cubeSize + 0.01f);
+        size.z = Mathf.Max(size.z, cubeSize + 0.01f);
+
         if (useScale)
         {
-            Size = MultVector(Size, meshToBake.transform.localScale);
+            size = MultVector(size, meshToBake.transform.localScale);
         }
 
         int x, y, z;
-        x = (int)(Size.z / cubeSize);
-        y = (int)(Size.y / cubeSize);
-        z = (int)(Size.z / cubeSize);
+        x = (int)(size.x / cubeSize);
+        y = (int)(size.y / cubeSize);
+        z = (int)(size.z / cubeSize);
 
         List<Triangle> tris = new List<Triangle>();
-        CreateTriangles(tris,meshToBake,useScale);
-        verts = CheckBoxTriIntersection(bounds, x, y, z, tris,meshToBake,useScale,cubeSize);
-        CreateMeshAsset(meshToBake,verts);
+        CreateTriangles(tris, meshToBake, useScale);
+        verts = CheckBoxTriIntersection(bounds, x, y, z, tris, meshToBake, useScale, cubeSize);
+        CreateMeshAsset(meshToBake, verts);
     }
 
-    static List<Vector3> CheckBoxTriIntersection(Bounds bounds, int x, int y, int z, List<Triangle> tris,MeshFilter mesh,bool useScale,float cubeSize)
+    static List<Vector3> CheckBoxTriIntersection(Bounds bounds, int x, int y, int z, List<Triangle> tris, MeshFilter mesh, bool useScale, float cubeSize)
     {
         List<Vector3> vectors = new List<Vector3>();
-         // check intersection for cubes of position x.y.z and triangles
-         Vector3 minPosition = bounds.min;
+        // check intersection for cubes of position x.y.z and triangles
+        Vector3 minPosition = bounds.min;
         if (useScale)
         {
             minPosition = MultVector(minPosition, mesh.transform.lossyScale);
@@ -145,10 +150,10 @@ public class CubizationWindow : EditorWindow
 
             float3 cubeCenter = minPosition + new float3(cubeSize, cubeSize, cubeSize) / 2;
             cubeCenter += new float3(cubeSize * i, cubeSize * j, cubeSize * k);
-            
+
             BurstBounds cubeBounds = new BurstBounds();
             cubeBounds.center = cubeCenter;
-            cubeBounds.extends = new float3(cubeSize, cubeSize, cubeSize)/2;
+            cubeBounds.extends = new float3(cubeSize, cubeSize, cubeSize) / 2;
 
             for (int l = 0; l < tri.Length; l++)
             {
@@ -159,7 +164,7 @@ public class CubizationWindow : EditorWindow
             }
         }
     }
-    private static void CreateMeshAsset(MeshFilter mesh,List<Vector3> Verts)
+    private static void CreateMeshAsset(MeshFilter mesh, List<Vector3> Verts)
     {
         Mesh vertMesh = new Mesh();
         vertMesh.name = mesh.name + "_Cubizied.asset";
@@ -173,10 +178,10 @@ public class CubizationWindow : EditorWindow
             AssetDatabase.SaveAssets();
         }
 
-        AssetDatabase.CreateAsset(vertMesh, path + mesh.name + "_Cubizied.asset");
+        AssetDatabase.CreateAsset(vertMesh, path + mesh.sharedMesh.name + "_Cubizied.asset");
         AssetDatabase.SaveAssets();
     }
-    private static void CreateTriangles(List<Triangle> tris,MeshFilter mesh,bool useScale)
+    private static void CreateTriangles(List<Triangle> tris, MeshFilter mesh, bool useScale)
     {
         for (int i = 0; i < mesh.sharedMesh.triangles.Length; i += 3)
         {
@@ -376,7 +381,7 @@ public class CubizationWindow : EditorWindow
             this.distance = distance;
         }
     }
-    public static float burstMin(float a,float b,float c)
+    public static float burstMin(float a, float b, float c)
     {
         return math.min(math.min(a, b), c);
     }
