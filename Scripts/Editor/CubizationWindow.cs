@@ -11,7 +11,6 @@ public class CubizationWindow : EditorWindow
 {
     MeshFilter mesh;
     float cubeSize = 0;
-    List<Vector3> Verts;
     bool visualise = false;
     bool useScale = true;
     [MenuItem("DB/Cubization/CreateMeshPoints")]
@@ -23,7 +22,7 @@ public class CubizationWindow : EditorWindow
     }
     public void Initialize()
     {
-        Verts = new List<Vector3>();
+  
     }
     private void OnGUI()
     {
@@ -37,55 +36,33 @@ public class CubizationWindow : EditorWindow
         {
             DrawCreateButton();
         }
-        bool drawGizmos = Verts.Count > 0 && visualise;
-        if (drawGizmos)
-        {
-            EditorGUILayout.Space();
-            EditorGUILayout.Space();
-            DrawVerts();
-        }
-    }
-    void DrawVerts()
-    {
-        EditorGUILayout.LabelField("--- Verts ---");
-        int count = Verts.Count;
-        if (count > 20) count = 20;
-        for (int i = 0; i < count; i++)
-        {
-            string vertData = i + ". x = " + Verts[i].z + " y = " + Verts[i].y + " z =" + Verts[i].z;
-            EditorGUILayout.LabelField(vertData);
-        }
     }
     void DrawCreateButton()
     {
         if (GUILayout.Button("Create"))
         {
-            Bake();
+            BakeMesh(this.mesh, this.useScale, this.cubeSize, out List<Vector3> verts);
+            
             if (visualise)
             {
-                CreateDebugCubes();
+                CreateDebugCubes(verts);
             }
         }
 
     }
-    void CreateDebugCubes()
+    void CreateDebugCubes(List<Vector3> verts)
     {
         GameObject tempParent = new GameObject("CubizationTest");
-        for (int i = 0; i < Verts.Count; i++)
+        for (int i = 0; i < verts.Count; i++)
         {
             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cube.transform.SetParent(tempParent.transform);
-            cube.transform.position = Verts[i];
+            cube.transform.position = verts[i];
             cube.transform.localScale = Vector3.one * cubeSize;
             cube.name = "Cube " + i;
         }
     }
-
-    void Bake()
-    {
-        BakeMesh(this.mesh, this.useScale, this.cubeSize);
-    }
-    public static void BakeMesh(MeshFilter meshToBake,bool useScale,float cubeSize)
+    public static void BakeMesh(MeshFilter meshToBake,bool useScale,float cubeSize ,out List<Vector3> verts)
     {
         Bounds bounds = meshToBake.sharedMesh.bounds;
         float3 Size = bounds.size;
@@ -101,7 +78,7 @@ public class CubizationWindow : EditorWindow
 
         List<Triangle> tris = new List<Triangle>();
         CreateTriangles(tris,meshToBake,useScale);
-        List<Vector3> verts = CheckBoxTriIntersection(bounds, x, y, z, tris,meshToBake,useScale,cubeSize);
+        verts = CheckBoxTriIntersection(bounds, x, y, z, tris,meshToBake,useScale,cubeSize);
         CreateMeshAsset(meshToBake,verts);
     }
 
