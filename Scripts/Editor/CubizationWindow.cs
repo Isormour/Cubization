@@ -171,7 +171,7 @@ public class CubizationWindow : EditorWindow
             
             BurstBounds cubeBounds = new BurstBounds();
             cubeBounds.center = cubeCenter;
-            cubeBounds.extends = new float3(cubeSize, cubeSize, cubeSize);
+            cubeBounds.extends = new float3(cubeSize, cubeSize, cubeSize)/2;
 
             for (int l = 0; l < tri.Length; l++)
             {
