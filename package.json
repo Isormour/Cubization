@@ -1,8 +1,8 @@
 {
-  "name": "com.db.cubizationtool",
+  "name": "com.divineblacksmith.cubetool",
   "version": "1.0.0",
   "displayName": "cubization",
-  "description": "Generates mesh with vertecies for center of cubes with specified size",
+  "description": "Vertex Texture Animation",
   "unity": "2022.3",
   "unityRelease": "5f1",
   "documentationUrl": "https://example.com/",
@@ -13,7 +13,7 @@
   },
   "author": {
     "name": "Isormour",
-    "email": "isormour@gmail.com",
+    "email": "unity@example.com",
     "url": "https://www.unity3d.com"
   }
 }
